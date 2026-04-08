@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Docker and OS
+.DS_Store
+.env
+
+# Database Data (if you ever map a local volume for Postgres)
+postgres-data/
+
+# Log files
+*.log
