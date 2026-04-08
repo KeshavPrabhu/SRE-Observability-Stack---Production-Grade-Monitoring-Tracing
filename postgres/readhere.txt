@@ -1,0 +1,45 @@
+First, we need to populate the database initialization script. When the official Postgres Docker image starts for the very first time, it automatically looks for any .sql files mapped to its docker-entrypoint-initdb.d folder and runs them.
+
+
+Discovering docker-entrypoint-initdb.d is a major "aha!" moment when you are learning Docker for DevOps.
+
+It is not actually a core feature of Docker itself. Instead, it is a special "magic" directory built specifically into the official PostgreSQL Docker image (and other database images like MySQL, MariaDB, and MongoDB).
+
+Here is exactly how it works and why we are using it:
+
+The Problem it Solves
+
+Normally, if you spin up a brand new, empty database server, you have to manually log in, create the tables, and insert your initial data before your application can actually use it. In an automated CI/CD pipeline or a local developer setup, doing that manually is a massive headache.
+
+The Solution: The "First Boot" Magic:
+
+The engineers who built the Postgres Docker image wrote a startup script (called an "entrypoint") that runs every time the container turns on.
+
+This script has a special rule programmed into it:
+
+1. It checks if the database is completely empty (meaning this is the very first time the container has ever been started).
+
+2. If it is empty, it looks inside the /docker-entrypoint-initdb.d/ folder inside the container.
+
+3. If it finds any .sql or .sh files in that folder, it runs them automatically before it lets anyone connect to the database.
+
+How We Are Using It:
+This is a bind mount. You are telling Docker: "Take the init.sql file from my WSL laptop, and sneakily place a copy of it directly into that magic docker-entrypoint-initdb.d folder inside the container."
+
+Because we did that, when you run docker compose up, this entire sequence happens with zero human intervention:
+
+The Postgres container boots up.
+
+It realizes it has no data.
+
+It looks in the magic folder and finds your init.sql file.
+
+It reads the file, creates the users, questions, and attempts tables, and inserts the 5 questions.
+
+It finishes booting and announces, "Ready for connections!"
+
+⚠️ The SRE "Gotcha" (Very Important)
+Because it only runs on the first boot, if you make a mistake in your init.sql file, you can't just fix the file and run docker compose restart. The database isn't empty anymore, so it will ignore the file!
+
+If you ever need it to run the script again from scratch, you have to completely destroy the container and its hidden data volume by running: docker compose down -v.
+

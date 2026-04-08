@@ -1,0 +1,65 @@
+# docker-compose.yaml
+
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15.3-alpine
+    container_name: sre-postgres
+    environment:
+      POSTGRES_USER: examuser
+      POSTGRES_PASSWORD: exampassword
+      POSTGRES_DB: examdb
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    ports:
+      - "5432:5432"
+    networks:
+      - sre_net
+
+  #networks:
+  #  sre_net:
+  #    driver: bridge
+
+  # python api backend
+  backend:
+    build: ./app/backend
+    container_name: sre-backend
+    environment:
+      #its uses the DNS name "postgres" to connect
+      - DATABASE_URL=postgresql://examuser:exampassword@postgres:5432/examdb
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - sre_net
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+
+  # the Nginx web server and reverse proxy
+
+  nginx:
+    image: nginx:1.25.1-alpine
+    container_name: sre-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./app/frontend:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+      - "8081:8081"
+    depends_on:
+      - backend
+    networks:
+      - sre_net
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+
+networks:
+  sre_net:
+    driver: bridge

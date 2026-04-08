@@ -1,0 +1,5 @@
+#This is requrements.txt for backend 
+
+Flask==2.3.2
+psycopg2-binary==2.9.6
+SQLAlchemy==2.0.19
