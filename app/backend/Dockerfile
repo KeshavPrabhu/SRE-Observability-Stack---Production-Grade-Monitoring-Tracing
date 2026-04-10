@@ -3,4 +3,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
-CMD ["python" , "app.py"]
+CMD ["opentelemetry-instrument" , "python" , "app.py"]
+
+
+# Wrap the python execution with the OTel agent
+#CMD ["opentelemetry-instrument", "python", "app.py"]
