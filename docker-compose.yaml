@@ -29,10 +29,15 @@ services:
     environment:
       #its uses the DNS name "postgres" to connect
       - DATABASE_URL=postgresql://examuser:exampassword@postgres:5432/examdb
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=quantum-sre-backend 
+      - OTEL_TRACES_EXPORTER=none # temparary disable until we set up the TEMPO 
+      - OTEL_METRICS_EXPORTER=otlp
     ports:
       - "5000:5000"
     depends_on:
       - postgres
+      - otel-collector 
     networks:
       - sre_net
     logging:
@@ -59,6 +64,70 @@ services:
       driver: "json-file"
       options:
         tag: "{{.Name}}"
+
+# Node Exporter (Hardware metrics)
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: sre-node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)'
+    networks:
+      - sre_net
+
+# Prometheus (The metrics database)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sre-prometheus 
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus 
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    networks:
+      - sre_net
+
+# telegraf (for database metrics )
+  telegraf:
+    image: telegraf:1.28-alpine
+    container_name: sre-telegraf
+    restart: unless-stopped
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+      - "9273:9273"
+    depends_on:
+      - postgres
+    networks:
+      - sre_net
+
+#otel collector 
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: sre-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317" #otlp gRPC reciver
+      - "8889:8889" # prometheus metrics exporter 
+    networks:
+      - sre_net  
+
+volumes:
+  prometheus_data:
 
 networks:
   sre_net:
