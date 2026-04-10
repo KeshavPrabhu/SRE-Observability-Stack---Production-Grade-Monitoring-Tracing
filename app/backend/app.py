@@ -21,7 +21,7 @@ def simulate_real_world_issues(endpoint="general"):
     
     # Issue Type 1: High Latency ( RED signal: 'Duration' anomaly )
     if endpoint == "submit":
-        # Submissions are prone to performance bottlenecks at Minutus Computing.
+    .
         if chance <= 20: # 20% chance of extreme delay (3-6 seconds)
             logger.warning("Observability Nightmare Detected: submission latency spike simulated.")
             time.sleep(random.uniform(3.0, 6.0))

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuantumSRE Certification Portal</title>
     <style>
-        /* Professional Palette & Structured Layout - Inspired by Assessment Systems */
+      
         :root {
             --bg-color: #f6f8fb;
             --main-blue: #0A3D62; /* Corporate blue */
@@ -27,23 +27,22 @@
         #user-info-display { font-size: 0.9rem; font-weight: bold; display: flex; gap: 15px; }
         #user-info-display span { color: var(--main-blue); }
 
-        /* Main Container for professional spacing */
+    
         main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         
-        /* Base View Container - all screens use this base */
+        
         .view-container { display: none; background: #fff; padding: 2.5rem; border-radius: 12px; box-shadow: var(--card-shadow); width: 100%; max-width: 600px; box-sizing: border-box; }
         .view-container.active { display: block; }
         
-        /* Utility Classes for structuring */
+     
         .center-content { text-align: center; }
         h2, h3 { color: var(--main-blue); margin-bottom: 20px; }
         p { line-height: 1.6; color: #555; }
         
-        /* Forms & Inputs - Image_0.png reference for input look */
         input[type="text"] { width: 100%; padding: 12px 15px; margin-bottom: 20px; border: 1px solid #d4d8db; border-radius: 6px; box-sizing: border-box; font-size: 1rem; transition: border-color 0.2s; }
         input[type="text"]:focus { border-color: var(--light-blue); outline: none; box-shadow: 0 0 0 3px rgba(60, 110, 113, 0.1); }
         
-        /* Professional Button Grouping - RED method connection */
+       
         button { padding: 12px 24px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: all 0.2s ease; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .btn-primary { background: var(--main-blue); color: var(--text-light); width: 100%; }
@@ -61,12 +60,12 @@
         .btn-danger { background: var(--accent-red); color: var(--text-light); }
         .btn-danger:hover { background: #c0392b; }
 
-        /* Themed Login Section - Modern illustration similar to image_0.png */
+      
         #login-view { max-width: 450px; }
         .login-visual { background: #eff3f8; border-radius: 50%; width: 120px; height: 120px; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--main-blue); font-weight: bold; }
         .login-header-sub { color: #888; margin-top: -10px; margin-bottom: 30px; }
 
-        /* Modern Dashboard look with structured sections */
+      
         #dashboard-view { max-width: 800px; padding: 2rem; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
         .dash-card { background: #fff; border: 1px solid #e1e4e8; border-radius: 8px; padding: 20px; transition: box-shadow 0.2s; cursor: pointer; }
@@ -76,7 +75,6 @@
         .status-active { background: rgba(46, 204, 113, 0.15); color: #219150; }
         .status-inactive { background: #eee; color: #777; }
 
-        /* Professional Instructions Page styling */
         #instructions-view { max-width: 750px; text-align: left; }
         .instruct-list { margin-top: 30px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; padding: 0; list-style: none; }
         .instruct-item { padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
@@ -84,7 +82,7 @@
         .instruct-icon { font-size: 1.4rem; color: var(--light-blue); width: 30px; }
         .instruct-text { color: #555; flex: 1; }
 
-        /* Full-screen assessment layout - inspired by images_5.png and _6.png */
+        
         #assessment-view { max-width: 100%; height: 100%; border-radius: 0; padding: 0; background: var(--bg-color); box-shadow: none; display: flex; flex-direction: column; }
         .assessment-main-content { flex: 1; display: flex; padding: 20px; gap: 20px; }
         
@@ -107,7 +105,7 @@
 
         .controls-area { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid #eee; padding-top: 25px; margin-top: 25px; }
 
-        /* Structured Logging Area - professional footer style */
+       
         footer { margin-top: auto; background: #fff; border-top: 1px solid #eee; padding: 10px; width: 100%; box-sizing: border-box; }
         #logs { height: 60px; overflow-y: auto; background: #222; color: #a0ff9b; font-family: 'Consolas', monospace; font-size: 0.8rem; padding: 10px; border-radius: 4px; box-sizing: border-box; }
         #logs::-webkit-scrollbar { width: 5px; }
@@ -225,7 +223,7 @@
 
         let questions = [];
         let currentQuestionIndex = 0;
-        let selectedAnswers = {}; // {question_id: selected_option_key}
+        let selectedAnswers = {}; 
         let examTimeInSeconds = 900; // 15 minutes
         let timerInterval;
 
@@ -233,7 +231,7 @@
         function showView(viewId) {
             document.querySelectorAll('.view-container').forEach(view => view.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            window.scrollTo(0,0); // Reset scroll position
+            window.scrollTo(0,0); 
         }
 
         async function simulateTraffic(action) {
@@ -257,16 +255,16 @@
                 log(`Session setup initialized. Waiting for user readiness.`);
             } 
             else if (action === 'submit') {
-                clearInterval(timerInterval); // Stop the timer
+                clearInterval(timerInterval); 
                 log("Assessment complete. Generating structured report...");
                 url = '/api/submit';
                 const submissionData = questions.map((q, index) => ({
                     question_id: q.id,
-                    selected_answer: selectedAnswers[index] || null // Send null if skipped
+                    selected_answer: selectedAnswers[index] || null
                 }));
                 options = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({candidate: user, exam: "QS Associate", submission: submissionData}) };
                 showView('login-view');
-                resetPortalState(); // Reset everything
+                resetPortalState(); 
             }
             else if (action === 'exit') {
                 if(confirm("Confirm: End and submit the assessment immediately? This cannot be undone.")) {
@@ -276,7 +274,7 @@
                 return;
             }
 
-            // Fire off the API request for the backend to log (RED signal)
+           
             try {
                 const res = await fetch(url, options);
                 const data = await res.json();
@@ -291,7 +289,7 @@
         //  Assessment Specific Logic
         // =============================================
         
-        // Step 1: Initialize full assessment flow
+      
         async function startAssessment() {
             log("Certification flow initialized. Loading encrypted question set...");
             try {
@@ -313,7 +311,7 @@
             }
         }
 
-        // Timer controller
+       
         function startTimer() {
             clearInterval(timerInterval);
             updateTimerDisplay(); // Initial update
@@ -335,7 +333,7 @@
             document.getElementById('exam-timer').innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
-        // Build Question Palette (inspired by image_5.png)
+     
         function buildPalette() {
             const paletteGrid = document.getElementById('palette-grid');
             paletteGrid.innerHTML = '';
@@ -348,15 +346,14 @@
             }
         }
 
-        // Question display controller (Phase 2 will replace placeholders with DB data)
+       
         function displayQuestion() {
-            // Placeholder: The existing DB only has 5 questions. Real aptitude exams have many more.
-            // We will display Phase 1 questions if they exist, otherwise we use structured placeholders.
+            
             const currentQ = questions[currentQuestionIndex] || {text: `[Sample Question ${currentQuestionIndex + 1} for Visuals] Real SRE question will go here in Phase 2.`};
             
             document.getElementById('q-text').innerText = `${currentQuestionIndex + 1}. ${currentQ.text}`;
             
-            // Standard A/B/C/D MCQ option rendering
+          
             const optionKeys = ['A', 'B', 'C', 'D'];
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = ''; // Reset
@@ -368,7 +365,7 @@
                 optionsContainer.appendChild(label);
             });
 
-            // Handle Navigation Button Visibility
+         
             document.getElementById('prev-btn').style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
             document.getElementById('next-btn').style.display = currentQuestionIndex === 14 ? 'none' : 'block';
             document.getElementById('end-exam-btn').style.display = currentQuestionIndex === 14 ? 'block' : 'none';
@@ -376,7 +373,7 @@
             updatePaletteHighlight();
         }
 
-        // Palette Highlight Manager
+      
         function updatePaletteHighlight() {
             document.querySelectorAll('.q-nav-box').forEach((box, index) => {
                 box.classList.remove('active', 'answered');
