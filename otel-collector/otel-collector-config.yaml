@@ -9,7 +9,10 @@ receivers:
 exporters:
   prometheus:
     endpoint: "0.0.0.0:8889"
-    # We will add Tempo here later for distributed tracing!
+  otlp:
+    endpoint: "tempo:4317"    # Forward traces to Tempo
+    tls:
+      insecure: true
 
 service:
   pipelines:
@@ -17,3 +20,6 @@ service:
       receivers: [otlp]
       exporters: [prometheus]
 
+    traces:                   # New Pipeline for Traces!
+      receivers: [otlp]
+      exporters: [otlp]

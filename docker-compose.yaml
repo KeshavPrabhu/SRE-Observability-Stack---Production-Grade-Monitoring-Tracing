@@ -31,7 +31,7 @@ services:
       - DATABASE_URL=postgresql://examuser:exampassword@postgres:5432/examdb
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - OTEL_SERVICE_NAME=quantum-sre-backend 
-      - OTEL_TRACES_EXPORTER=none # temparary disable until we set up the TEMPO 
+      - OTEL_TRACES_EXPORTER=otlp 
       - OTEL_METRICS_EXPORTER=otlp
     ports:
       - "5000:5000"
@@ -125,6 +125,62 @@ services:
       - "8889:8889" # prometheus metrics exporter 
     networks:
       - sre_net  
+
+# Grafana 
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: sre-grafana
+    restart: unless-stopped
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-polystat-panel
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - sre_net
+    depends_on:
+      - prometheus
+
+# Loki (Log Aggregation)
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: sre-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - sre_net
+
+  # Promtail (Log Collector)
+  promtail:
+    image: grafana/promtail:2.9.2
+    container_name: sre-promtail
+    volumes:
+      - ./promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Gives access to Docker engine
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - sre_net
+
+  # Tempo (Distributed Tracing)
+  tempo:
+    image: grafana/tempo:2.2.4
+    container_name: sre-tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo/tempo-config.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "3200:3200"
+    depends_on:
+      - otel-collector
+    networks:
+      - sre_net
 
 volumes:
   prometheus_data:
